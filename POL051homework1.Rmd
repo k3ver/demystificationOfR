@@ -1,0 +1,331 @@
+---
+title: "Project 1: Migrant deaths"
+author: "Kevin Angeles Marquez"
+date: "April 15, 2025"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+options(scipen = 999)  # turns off scientific notations like 1e+40
+
+rm(list=ls(all=FALSE))
+
+setwd("~/schoolWork/2025springQuarter/POL051/homework")
+
+library(tidyverse)
+library(ggplot2)
+library(janitor)
+library(plotly)
+```
+### Understanding the migrant death issue
+
+
+The data on migrant deaths comes from the Arizona OpenGIS Project, cosponsored by Humane Borders and the Pima County Office of Medical Examiner.  I've edited the data set to include all recorded migrant deaths between 2000 up through March 2025.  The objective of this project is to give you continued experience in working with and making sense of quantitative data, while at the same time, giving you the opportunity to better understand at a deep level, the nature of the migrant death issue.  Above all else, my goal is to always honor and humanize those who have died in the desert.  These data permit a better understanding of the death crisis. 
+
+For purposes of this project, you will be asked to produce a number of high-quality visualizations as well as compute some basic univariate statistics. Your job is to take what I have provided, analyze it, and tell the story  I want to know something important, interesting, and useful about the migrant death crisis given the tasks assigned to you. Ultimately, when presented with information, you need to get practice in learning how to engage it.  While this assignment is tethered to the migrant death data set, all skills used here would be transferrable to any data set. 
+
+What I am looking for here is something other than mechanical interpretations.  I want to see creativity.  What do I mean by creativity?  To be blunt, creativity *is not* repeating numbers or statistics you produce in a table.  I don't need anyone to do that as I can see it with my own eyes.  Creativity paints a picture as to what the human picture of the death crisis looks like, looking at the observed data.  Answers that are mechanical are usually nonanalytical. Creativity means bringing in information and context outside of the confines of the specific charts, plots, or questions.  In the end, if you simply report the results with no attempt at interpretation, I would not expect anything above a "C"-level grade (i.e. you just reproduce in words what I see in the tables or charts).  In class, we will go over in great detail tips on how to avoid these problems, so follow those tips and you're going to be well on your way. 
+
+This assignment is worth 800 points and is due by 11:59 PM on April 29. 
+
+
+#### Getting started
+
+The data file is a csv file saved to my GitHub site.  
+
+```{r echo=FALSE}
+md="https://raw.githubusercontent.com/mightyjoemoon/POL51/main/ogis_migrant_deaths-11.csv"
+
+md<-read_csv(url(md))
+
+summary(md)
+# View(md)
+```
+
+#### Creating year variable from date function and inspecting migrant deaths by year
+
+Because we may want to look at yearly data, it's useful to generate a variable that records the calendar year in which migrant remains were found.  The code in the chunk below does just this.  In addition to creating the new variable, I use the R command ***tabyl*** to produce a table of migrant deaths by year.  In all, there are about 4,000 recorded deaths in the time frame of the data set I've created.  The table will show you the number of remains recovered by year along with the proportion of total deaths each year accounts for.  So in 2010, we see 224 remains were recovered.  The proportion of the total number of deaths accounted for by this year is 0.05476773 (i.e. $\frac{224}{4090}$).  Multiply this proportion by 100 and you get the percent contribution.  For 2010, about 5.5% of all the recovered remains occurred in 2010. One way to quickly assess the persistence of the death crisis is to inspect the proportions. If the crisis was abating, we'd expect to see a substantial decline in the proportion.  If the crisis is persistent, we'd expect to see these proportions to be very similar across time.  (Note that 2025 will be a very small number because we only have partial data for this year.)  What do you see when you look at these proportions?  
+
+```{r echo=TRUE}
+md$date <-  as.Date(md$`Reporting Date`,'%m/%d/%y')
+
+md$year <- as.numeric(format(md$date,'%y'))
+
+md$month <- as.numeric(format(md$date, '%m'))
+
+
+#This ensures the year is reported as "2000, 2001, ... ,2024" instead of "0,1, ... , 24".
+md$year20 <- 2000 + md$year
+
+
+
+tabyl(md$year20)
+```
+
+#### Task 1: Visualizing migrant deaths
+
+For this task, I want you to produce a barplot of migrant remains recovered by year.  You can use the code below to generate the plot.  Often (most always), it's easier to visualize quantitative data than looking at a table of data.  The code in the chunk below will create a barplot where each bar corresponds to the number of migrant remains recovered in each year.  When you look at this plot, what do you see?  What interpretation would you give to this?  Does the plot show the crisis abating?  Does it seem persistent?  Is it getting worse?  Your interpretation should be well-written, clear, and *non-mechanical.* The plot and the interpretation is worth 100 points.   
+
+```{r echo=TRUE}
+labelsforx<- c("2000", "2001", "2002", "2003", "2004",              "2005", "2006", "2007", "2008", "2009", "2010",
+                          "2011", "2012", "2013", "2014", "2015",
+                          "2016", "2017", "2018", "2019", "2020",
+                          "2021", "2022", "2023", "2024", "2025")
+
+ggplot(md, aes(year20)) +
+  geom_bar(fill = "lightskyblue4") +
+     scale_x_continuous(breaks=seq(2000,2025,1), labels= labelsforx) +
+    labs(title="Migrant remains recovered by year on the Arizona/Mexico border, 2000-2025", 
+subtitle="Data from the Arizona OpenGIS Project (https://humaneborders.info/app/map.asp)",
+          y="Number Recovered", 
+          x="Year") +
+  theme_classic() +
+    theme(axis.text.x = element_text(size=8, angle=45, hjust=1),
+            axis.ticks = element_blank())
+
+
+```
+
+#### Task 1 answer should go here.
+We can reasonably assume that the number of migrant remains recovered is in some way directly correlated to the number of people crossing the border every year. It is important to note however that many other things could influence the number of remains recovered, and we can't definitively say that more people were crossing in 2007–2011 and 2020–2022 where the major peaks occur. It is possible that the fluctuations observed are due solely to natural variation, as there aren't any obvious policy decisions that occurred in the years that have peaks or dips. Regardless, there is a consistently high number of bodies recovered, and it is important to research further into the root causes of these deaths in order to help combat the issue.
+
+
+#### Task 2: Lethality by month
+
+For this task, I want *you* to create a barplot of the number of migrant remains recovered by *calendar month*.  Using the code in the previous chunk will be useful but it will need to be modified.  After you create the plot, provide a substantive interpretation of the results.  Your score for this will be based on quality of the plot (100 points) and quality of the write-up (100 points)
+
+```{r echo=TRUE}
+#Type code in this chunk
+labelsforx <- c("Jan", "Feb", "Mar", "Apr", 
+                "May", "Jun", "Jul", "Aug", 
+                "Sep", "Oct", "Nov", "Dec")
+
+ggplot(md, aes(month)) +
+  geom_bar(fill = "wheat", color = "black") +
+  scale_x_continuous(breaks=seq(1,12,1), labels= labelsforx) +
+  labs(title="Migrant remains recovered by month along Arizona/Mexico Border, 2000-2025", 
+       subtitle = "Data from the Arizona OpenGIS Project (https://humaneborders.info/app/map.asp)",
+       x = "Month",
+       y = "Number recovered") +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 10, angle = 45, hjust = 1),
+  axis.ticks = element_blank())
+
+```
+
+#### Task 2 answer should go here.
+The bar plot shows a strong correlation between the number of migrant remains found and the month of the year, with the majority of remains found from June to August. The most obvious cause for this would be temperature, as these months tend to be the hottest and could be the cause of mortality for many of the remains found. However, migrant remains can be found anytime after death meaning we cannot be completely sure that all of the remains came from people that specifically crossed in these months. Either way, we know that excessively hot temperatures can be deadly for individuals crossing the border, highlighting the importance of providing water and other resources, especially during these hotter periods. An article written by Katie Smith for NewsNation supports this view, as it discusses how extreme temperatures in Arizona that can reach 110 or 115 degrees pose an even greater risk for those crossing the border. https://www.newsnationnow.com/us-news/immigration/border-coverage/heat-wave-migrant-deaths/
+
+
+#### Task 3: Gender and migrant deaths
+
+How do migrant deaths and gender relate to one another?  The code in the chunk below creates a "factor-level" variable recording the gender of the migrant.  Since gender is not always determined, there is a category called "undetermined."  Using the ***tabyl*** function, I create a table showing  the total number of remains recovered that are male, female, and undetermined.  For this task, reproduce the code below and provide a brief interpretation of the results.  This task is worth 50 points. 
+
+```{r echo=TRUE}
+  
+md$gender<-factor(md$Sex,
+                  levels=c("male", "female", "undetermined"),
+                    labels=c("male", "female", "undetermined"))
+tabyl(md$gender)
+```
+
+#### Task 3 answer should go here.
+We see that a large majority of remains recovered come from males. With such a drastic ratio of male remains to female remains, the data heavily implies that the majority of individuals crossing the border are males. This could be due to the general culture, which places more pressure on men to be the "breadwinners" of a family unit. Migrating would therefore be one way for them to provide for their families. Obviously, this is not the only possible explanation for the data, since there could be many other contributing factors. It is possible that the remains of females are found less often, or simply that females crossing the border die less often than males do. 
+
+
+#### Task 4: Gender, death and time
+
+On Github, there is a .csv file called ***mdg.csv.***  You will need to access this file.  The code below will do this. 
+
+```{r echo=TRUE}
+
+rm(list=ls(all=FALSE)) #Keep this line in 
+rm(list=ls(all=TRUE)) #Keep this line in 
+
+mdg="https://raw.githubusercontent.com/mightyjoemoon/POL51/main/mdg.csv"
+
+mdg<-read_csv(url(mdg))
+
+summary(mdg)
+
+```
+
+This data set has 4 variables: year, male, female, and undetermined. The variables "male," "female", and "undetermined" give the proportion of remains recovered for each group by year.  So if in a given year, 0.76 of the remains recovered were male, this implies 76 percent were male.  To tidy up the plot I am going to ask you to create three new objects called "Male," "Female," and "Undetermined" that convert the proportions into percentages.
+
+```{r echo=TRUE}
+#Here is code to get you started
+mdg$Male <- mdg$male * 100
+mdg$Female <- mdg$female * 100
+mdg$Undetermined <- mdg$undetermined * 100
+
+```
+
+
+It may be useful to visualize these data by way of a line plot. Below is *the start* of some code to create a time-series plot.  Provide the relevant code to complete the plot.  Your plot, if properly done will have three lines corresponding to the three groups (Male, Female, Undetermined) and have informative main, $y$, and $x$ titling.  After creation of the plot, provide a substantive interpretation of the results.  What do we see, what do we learn? 
+
+R tasks of reading in the data, creating the new objects, and creating the plot will be worth 100 points.  The analysis will be worth 100 points. 
+
+```{r echo=TRUE}
+
+ggplot(mdg, aes(x = year)) +
+  geom_line(aes(y = Male, color="Male"), linewidth=1) +
+  geom_line(aes(y = Female, color="Female"), linewidth=1) +
+  geom_line(aes(y = Undetermined, color="Undetermined"), linewidth=1) +
+  scale_color_manual(values = c("coral2", "lightskyblue3", "gray")) + labs(title="Percentage of bodies recovered by sex from 2000-2025",
+      subtitle = "Data from the Arizona OpenGIS Project (https://humaneborders.info/app/map.asp)",
+      y="Percentage", x="Year",
+      color="") +
+  theme_bw()
+
+```
+#### Task 4 answer should go here.
+The conclusions we draw from this graph are very similar to the previous conclusions we got from the table, but now we can see some change over time. We can see that the ratio between male and female remains recovered in the last 5 years has converged, with the number of male remains recovered starting to dip. Since this graph shows the percentage of total remains identified by sex and not the actual number, it is possible for there to be either more females crossing the border, more females crossing the border, or both could be true. Nevertheless, these assumptions could be incorrect as the number of bodies with undetermined sex also increased at the same rate in recent years. Therefore, it is possible that groups identifying migrant remains could have incorrectly identified a portion of the bodies. Ultimately, many different factors -cultural and otherwise- can contribute to this great disparity between remains of people from a different sex.
+
+
+#### Task 5: Visualizing deaths by month and year 
+I have created a dataset called "monthlydeathsbyyear.csv."  And it can be found on my Github site.  The code in the chunk below will access the file.  
+
+```{r echo=TRUE}
+rm(list=ls(all=TRUE)) #Keep this line in 
+
+mdy="https://raw.githubusercontent.com/mightyjoemoon/POL51/main/monthlydeathsbyyear.csv"
+
+mdy<-read_csv(url(mdy))
+
+summary(mdy)
+```
+
+In order to take advantage of some R capabilities with time series data, I am creating a date variable that will allow us to assess migrant remains recovered by month and year.  The code in the chunk below will do this. I will discuss the logic of this in class. 
+
+```{r echo=TRUE}
+
+mdy$ym<-as.Date(with(mdy,paste(year,month,obs, sep="-")),"%Y-%m-%d")
+mdy
+
+# View(mdy)
+```
+
+The code in the chunk below will produce a time series plot of the migrant death data by month and year. The plot is saved as an object I called "p."  Run this code to verify it works. 
+
+```{r echo=TRUE}
+# Usual area chart
+p <- mdy %>%
+  ggplot( aes(x=ym, y=remainsmonth)) +
+  geom_area(fill="#69b3a2", alpha=0.5) +
+  geom_line(color="#69b3a2") +
+  labs(title="Migrant remains recovered on the Arizona/Mexico border, 2000-2025", 
+  subtitle="Data from the Arizona OpenGIS Project (https://humaneborders.info/app/map.asp)",
+  y="Remains recovered", x="Year and month") +
+  theme_bw()
+p
+```
+
+
+Next, run this code and see what it is you produce! For this part of the task, write an interpretation of this plot.  What do we learn substantively about the migrant death crisis over time? This write-up is worth 100 points. 
+
+```{r echo=TRUE}
+
+# Turn it interactive with ggplotly
+p <- ggplotly(p)
+p
+
+
+
+```
+
+#### Task 5 write-up should go here. 
+The information that this plot gives us brings together the previous plots that sort the data by year and by month. We still see the general peaks of remains recovered in the years before 2010 and around 2020. The individual repetitions of peaks every year stem from the difference that occurs per month, with most of the remains pertaining to the middle months of the year. We concluded that this was likely due to hotter and more extreme temperatures in this time of year, but it could very well be a variety of other reasons. 
+
+
+#### Task 6: See if you can do this! 
+
+What is this plot showing us?  What is going on in the plot?  This task is worth 50 points. 
+
+
+```{r echo=TRUE}
+
+pal <- c("green", "blue", "red")
+
+fig <-  plot_ly(data = mdy ,x =  ~ym, y = ~remainsmonth, color = ~remainsmonth, colors = pal, type = 'scatter', mode = 'markers')%>%
+  layout(title = 'Scatterplot of migrant remains recovered by month and year', plot_bgcolor = "white",
+         xaxis = list(
+           title = "Month and Year",
+           range = list("2000-01-01", "2025-3-01")
+         ),
+         yaxis = list(
+           title = "Number of Remains Recovered"
+         ))
+
+fig
+
+
+```
+This scatterplot reveals that certain months—such as July in 2005, 2007, and 2010—stand out as clear outliers, with significantly higher numbers of recovered migrant remains. The concentration of red and blue dots during these hotter months supports the conclusion that extreme heat is a major contributor to migrant mortality. Outside of these spikes, the monthly data shows a relatively stable pattern that corresponds with trends observed in the yearly bar plot, particularly elevated numbers around 2010 and 2020. The visualization suggests a recurring danger during summer months that exacerbates an already dangerous endeavor.
+
+#### Task 7: Univariate statistics
+
+For this task, I want you to provide a substantive answer to the following questions (7.1 and 7.2 are worth 50 points each; 7.3 is worth 100 points):
+
+##### Task 7.1: Statistics for all months/years
+7.1. What is the mean, standard deviation, median, and IQR for the variable called "remainsmonth."  This variable records the number of deaths by month by year.  What do we learn from these statistics? Is there evidence of skewness in the data?    
+
+
+
+```{r echo=TRUE}
+#Insert code to answer this here
+mean(mdy$remainsmonth)
+
+sd(mdy$remainsmonth)
+
+median(mdy$remainsmonth)
+
+IQR(mdy$remainsmonth)
+
+
+```
+
+#### Task 7.1 answer should go here. 
+The median value of 12 is relatively close to the mean (12 and ~13 respectively) suggesting that the data is not heavily skewed due to outliers. The interquartile range supports this further, indicating only a moderate spread in the middle portion of the data. Ultimately, we can conclude that the number of remains recovered across the different months and years stays relatively consistent, with similar patterns and no excessive outliers. 
+
+
+#### Task 7.2: Univariate statistics over time
+
+7.2. Compute the mean number of remains recovered *by year*.  Based on these results, what do we learn?  What years stand out to you? 
+
+```{r echo=TRUE}
+#Insert code to answer this here
+mdy %>%
+  group_by(year) %>%
+  summarize(mean_remains = mean(remainsmonth))
+
+```
+
+#### Task 7.2 answer should go here. 
+The trends we see in this table align with our previous conclusions, seeing the spike in the mean number of remains found during the years around 2010 and 2020. The early 2000s (especially 2000–2002) show much lower monthly averages, whether that is due to methods for finding remains at the time or policy decisions of the time that impacted immigration. The sharp rise again in 2020–2021 could be related to COVID-19-era border policy changes or other issues that migrants faced in their home countries. 
+
+
+#### Task 7.3: Time-series box-plot
+
+7.3. Create a boxplot of monthly remains recovered by year.  Below is shell code to get you started.  This will produce an unacceptable plot but it will get you on your way.  Adorn this plot with titles, color (if you wish), and any other fancy things to make it more interesting.  Following this, provide an interpretation of the plot.  What do we learn from this plot about migrant remains recovered? 
+
+```{r echo=TRUE}
+#Shell code
+
+mdy$year<-as.factor(mdy$year)
+
+bp<-ggplot(mdy, aes(remainsmonth, year)) + 
+  geom_boxplot(fill = "lightskyblue3") +
+  labs(title = "Distribution of migrant remains recovered by year, 2020-2024",
+       subtitle = "Data from the Arizona OpenGIS Project (https://humaneborders.info/app/map.asp)",
+       y = "Year", 
+       x = "Remains found")
+
+bp
+```
+
+
+#### Task 7.3 answer should go here. 
+The boxplot allows us to see how the number of migrant remains varies by year, and across different years. Some of the years with the most variability are 2002 and 2007 with a large interquartile range, and 2005, with a pretty large outlier above 60. Recent spikes may reflect worsening climate conditions—such as extreme desert heat during summer months—as well as migration policy shifts that push migrants toward more dangerous, remote routes. Similar to our previous conclusions, however, more context and information would be required in order to draw more conclusions, as these patterns could have many different root causes.
