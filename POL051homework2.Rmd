@@ -1,0 +1,159 @@
+---
+title: "Project 2: Understanding deportation through the lens of quantitative analysis"
+author: "B. Jones"
+date: "May 20, 2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+
+
+
+options(scipen = 999)  # turns off scientific notations like 1e+40
+
+rm(list=ls(all=TRUE))
+
+library(tidyverse)
+library(sjPlot)
+
+#Below, this is a working directory for my computer.
+#Change the contents within the parentheses to correspond
+#to YOUR COMPUTER!!!!  Remember: you need the quotes ("....")
+
+#setwd("/Users/bradfordjones/Dropbox/POL 51 Revamped/POL 51 Spring 2024/Slidesets")
+
+setwd("~/Dropbox/R Sandbox/Teaching Materials/Slidesets25")
+
+```
+
+### Overview
+
+I have compiled data of deportations by fiscal year from 1948 to 2022.  Your job is to use some of the skills we are learning in this class to better understand these data.  As such, I will be asking you to engage in a number of tasks requiring the use of $t$-tests and simple regression.  Your grade will be based on analysis and presentation of the data.  This assignment is worth 600 points.  It will be due May 30 by 11:59 PM.  You need to submit an HTML document or a document that includes code and viewable output.  
+
+### Reading in the deportation data
+
+This chunk reads in the data on deportations from 1948 to 2022. 
+
+\tiny
+
+```{r echo=TRUE}
+urlfile="https://raw.githubusercontent.com/mightyjoemoon/POL51/main/ICE_removals_1948.csv"
+
+remove.1<-read_csv(url(urlfile))
+
+summary(remove.1)
+```
+
+---
+
+### Task 1: Interpret barplot of deportations
+
+Below is code to produce a barplot of deportations over the time frame.  I want you to provide a professional-grade interpretation of the plot you are seeing.  This task is worth 100 points. 
+
+```{r echo=TRUE}
+
+df_melted <- aggregate(data = remove.1, Deportations ~ Year, mean)
+names(df_melted) <- c("Year", "mean_Deportations")
+
+ggplot(df_melted, aes(x = Year, y = mean_Deportations, width=1)) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(n.breaks = 10) +
+labs(title="Figure 1: Deportations by year (FY 1948-2022)",
+       y="Number of deportations", x="Fiscal year",
+       color="") +
+  theme_bw() +
+  theme(#panel.grid.major.y = element_line(colour = "grey", linetype = "dashed"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.text.y = element_text(size=9),
+    axis.text.x = element_text(size=9),
+    #axis.title.y=element_blank(),
+    #axis.title.x=element_blank(),
+    #legend.title=element_blank(),
+    #legend.position=c(.01, .77),
+    #legend.justification=c("left", "bottom"),
+    #legend.title = element_text(size = 5), 
+    #legend.text = element_text(size = 5),
+    #legend.margin=margin(0,0,0,0),
+    #legend.box.margin=margin(-1,-1,-1,-1),
+    plot.title = element_text(size=12))  
+
+
+
+```
+
+### Task 1 answer here
+
+
+
+### Task 2: T-test by Party
+
+Create a factor-level variable for Party of the President labeled "Republican" for
+Republicans and "Democrat" for Democrats.  Following this, compute a two-group difference-in-means test assessing the following research question: Are the number of Deportations under a Democratic Presidency significantly different from Deportations under a Republican Presidency?  In a paragraph, report results from the analysis using substantive language that could be understandable to a lay-person. This task is worth 100 points.  
+
+
+```{r echo=TRUE}
+#Insert code to do this task in this chunk 
+
+
+```
+
+### Task 2 answer goes here
+
+### Task 3: Regression with a dummy variable 
+Estimate a bivariate regression model of the form: $\hat{Deportations}=\beta_0 + \beta_1*Party~of~President$ and report the results from the regression model by summarizing the regression object.  Based on the *table* of results, what would be the predicted number of deportations for Republicans and for Democrats.  What does $\beta_0$ and $\beta_1$ tell us? Based on the model, is there evidence to reject the null hypothsis that $\overline{D}_{Dem}=\overline{D}_{Rep}$?  This task is worth 100 points. Before doing this, you should read "The US Deportation System: History, Impacts, and New Empirical Research" by Caitlin Patler and Bradford Jones.   
+
+```{r echo=TRUE}
+#Insert code to do this task in this chunk 
+
+
+```
+
+### Task 3 answer goes here
+
+
+### Task 4: Plot regression object
+
+Using $\textrm{plot_model}$ (from the $\textrm{sjPlot}$), provide a professional-grade plot of the regression model along with an interpretation of the plot.  Which hypothesis is the plot most consistent with? This task is worth 100 points.
+
+```{r echo=TRUE}
+
+#Insert code to do this task in this chunk 
+
+```
+
+### Task 4 answer goes here
+
+
+### Task 5: Regression by decade
+
+In the Patler and Jones article I asked you to read, they point out that several policies were enacted that made deportations easier to carry out.  Among one of the most important policy was the Illegal Immigration Reform and Immigrant Responsibility Act, 1996.  One prediction might be that after changes in the 1990 (like the IIRIA), we should observe and increase in deportations starting in the 1990s.  To assess this claim, do the following: 
+
+Create a well-labled factor-level variable denoting each decade starting with the 1950s (1951-1960) going up to the 2010s (2011-2020) and then estimate a regression model treating the dependent variable (i.e the number of deportations) as a function of the decade-factor level variable. Following this plot the regression model using $\textrm{plot_model}.  Provide a thorough interpretation of the regression model with a focus on the claims made in the paragraph above.  Are the results consistent with the basic claim made? This task is worth 100 points. 
+
+
+```{r echo=TRUE}
+
+#Insert code to do this task in this chunk 
+
+
+```
+
+### Task 5 answer goes here
+
+
+### Task 6: Pre-post 1996
+
+Create a *dummy variable* (or binary variable) coded 1 if the year is 1996 or later and 0 otherwise.  Estimate a regression model treating deportations as a function of this dummy variable. Plot the regression model and provide a thorough substantive interpretation of the regression results. To start, what would be the null and alternative hypotheses for $\beta_1$ given the research question?   Suggested ways to interpret this would be to report the predicted number of deportations in the later period compared to the earlier period as well as the discussing the coefficient showing the difference.  You should tie your interpretation back to the regression estimates. This task is worth 100 points. 
+
+```{r echo=TRUE}
+
+
+#Insert code to do this task in this chunk 
+
+```
+
+### Task 6 answer goes here
