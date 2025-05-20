@@ -1,6 +1,6 @@
 ---
 title: "Project 2: Understanding deportation through the lens of quantitative analysis"
-author: "B. Jones"
+author: "Kevin Angeles Marquez"
 date: "May 20, 2025"
 output: html_document
 ---
