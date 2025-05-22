@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 
 
-
 options(scipen = 999)  # turns off scientific notations like 1e+40
 
 rm(list=ls(all=TRUE))
@@ -25,7 +24,7 @@ library(sjPlot)
 
 #setwd("/Users/bradfordjones/Dropbox/POL 51 Revamped/POL 51 Spring 2024/Slidesets")
 
-setwd("~/Dropbox/R Sandbox/Teaching Materials/Slidesets25")
+setwd("~/schoolWork/2025springQuarter/POL051/homework")
 
 ```
 
@@ -97,7 +96,12 @@ Republicans and "Democrat" for Democrats.  Following this, compute a two-group d
 
 ```{r echo=TRUE}
 #Insert code to do this task in this chunk 
+remove.1$presidentParty <- factor(remove.1$Party, 
+                                 levels = c(0, 1), 
+                                 labels = c("Republican", "Democrat"))
+summary(remove.1$presidentParty)
 
+t.test(remove.1$Deportations~ remove.1$presidentParty, var = TRUE)
 
 ```
 
@@ -108,6 +112,8 @@ Estimate a bivariate regression model of the form: $\hat{Deportations}=\beta_0 +
 
 ```{r echo=TRUE}
 #Insert code to do this task in this chunk 
+regParty <- lm(Deportations~ presidentParty, data = remove.1)
+summary(regParty)
 
 
 ```
@@ -123,6 +129,13 @@ Using $\textrm{plot_model}$ (from the $\textrm{sjPlot}$), provide a professional
 
 #Insert code to do this task in this chunk 
 
+plot_model(regParty, type = "pred", terms = c("presidentParty"), ci.lvl = 0.95,
+           title = "\nDeportations under Democratic and Republican presidents\n", 
+           axis.title = c("Party", "Number of removals"), 
+           colors = c("black"))+
+             geom_line()+
+             theme_bw()
+
 ```
 
 ### Task 4 answer goes here
@@ -137,9 +150,23 @@ Create a well-labled factor-level variable denoting each decade starting with th
 
 ```{r echo=TRUE}
 
-#Insert code to do this task in this chunk 
+#Insert code to do this task in this chunk
 
+remove.1$period <- factor(remove.1$Decade, 
+                          levels = c(1950, 1960, 1970, 1980, 1990, 2000, 2010), 
+                          labels = c("1951-1960", "1961-1970", "1971-1980", 
+                                     "1981-1990", "1991-2000", "2001-2010", 
+                                     "2011-2020"))
 
+regDecades <- lm(Deportations~ period, data = remove.1)
+summary(regDecades)
+
+plot_model(regDecades, type = "pred", terms = c("period"), ci.lvl = 0.95,
+           title = "\nDeportations under Democratic and Republican presidents\n", 
+           axis.title = c("Party", "Number of removals"), 
+           colors = c("black"))+
+             geom_line()+
+             theme_bw()
 ```
 
 ### Task 5 answer goes here
