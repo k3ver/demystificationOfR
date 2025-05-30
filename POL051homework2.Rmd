@@ -86,6 +86,7 @@ labs(title="Figure 1: Deportations by year (FY 1948-2022)",
 
 ### Task 1 answer here
 
+The plot shows the shifts in U.S. deportation patterns. The number of deportations remained low until the mid to late 1990's, when the number of deportations began to rapidly increase. A likely cause for the sudden increase in the late 1990's is the introduction of the Illegal Immigration Reform and Immigrant Responsibility Act in 1996. This allowed immigration officials to assign some of their responsibilities to local and state officers (Patler and Jones 7), which would directly lead to more deportations. Furthermore, the enhancement of border security following the 9/11 attacks along with the inception of the Department of Homeland Security and U.S. Immigration and Customs Enforcement would cause this increase to continue well into the 2000's and 2010's. The very recent drop in deportations could be explained by the covid-19 pandemic, seeing as this could disrupt ordinary operations that would have otherwise brought along more deportations. 
 
 
 ### Task 2: T-test by Party
@@ -180,6 +181,24 @@ Create a *dummy variable* (or binary variable) coded 1 if the year is 1996 or la
 
 
 #Insert code to do this task in this chunk 
+
+remove.1$pre_post <- ifelse(remove.1$Year >= 1996, 1, 0)
+remove.1$pre_post96 <- factor(remove.1$pre_post)
+table(remove.1$pre_post96)
+
+remove.1$pre_post <- factor(remove.1$pre_post96, levels = c(0,1),
+                            labels = c("Before 1996", "After 1996"))
+
+t.test(remove.1$Deportations~remove.1$pre_post96)
+
+reg1 <- lm(Deportations~pre_post96, data = remove.1)
+summary(reg1)
+
+plot_model(reg1, type = "pred", terms = c("pre_post96"), ci.lvl = 0.95, 
+           title = "\nUse of deportations before and after 1996\n", 
+           axis.title = c("Period", "Number of deportations"), color = "black")+
+            geom_line()+ 
+            theme_bw()
 
 ```
 
