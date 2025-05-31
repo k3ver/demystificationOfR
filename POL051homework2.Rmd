@@ -86,7 +86,7 @@ labs(title="Figure 1: Deportations by year (FY 1948-2022)",
 
 ### Task 1 answer here
 
-The plot shows the shifts in U.S. deportation patterns. The number of deportations remained low until the mid to late 1990's, when the number of deportations began to rapidly increase. A likely cause for the sudden increase in the late 1990's is the introduction of the Illegal Immigration Reform and Immigrant Responsibility Act in 1996. This allowed immigration officials to assign some of their responsibilities to local and state officers (Patler and Jones 7), which would directly lead to more deportations. Furthermore, the enhancement of border security following the 9/11 attacks along with the inception of the Department of Homeland Security and U.S. Immigration and Customs Enforcement would cause this increase to continue well into the 2000's and 2010's. The very recent drop in deportations could be explained by the covid-19 pandemic, seeing as this could disrupt ordinary operations that would have otherwise brought along more deportations. 
+The plot shows the shifts in U.S. deportation patterns. The number of deportations remained low until the mid to late 1990's, when the number of deportations began to rapidly increase. A likely cause for the sudden increase in the late 1990's is the introduction of the Illegal Immigration Reform and Immigrant Responsibility Act in 1996. This allowed immigration officials to assign some of their responsibilities to local and state officers (Patler and Jones, 2025, page 7), which would directly lead to more deportations. Furthermore, the enhancement of border security following the 9/11 attacks along with the inception of the Department of Homeland Security and U.S. Immigration and Customs Enforcement would cause this increase to continue well into the 2000's and 2010's. The very recent drop in deportations could be explained by the covid-19 pandemic, seeing as this could disrupt ordinary operations that would have otherwise brought along more deportations. 
 
 
 ### Task 2: T-test by Party
@@ -108,8 +108,11 @@ t.test(remove.1$Deportations~ remove.1$presidentParty, var = TRUE)
 
 ### Task 2 answer goes here
 
+From the analysis of our sample data, we see that the number of deportations under Republican presidents was lower than the number under Democratic presidents (94,808 deportations compared to 125,843). However, this analysis doesn't necessarily tell us whether the observed difference is significant, or if it was simply due to random chance. We can figure this out by doing a t-test on the data and looking at the p-value. The p-value for this data set is 0.3244, which exceeds the value of 0.05 that we are looking for. A value of 0.05 would represent that the patterns in the data are statistically significant, as there would be a less than 5% chance of observed patterns being due to chance. Additionally, the t-value we got from running our t-test is close to 0. A t-value close to 0 indicates that the observed difference in average deportations, while present in the sample, is relatively small when we account for the typical fluctuations and inconsistencies in the deportation data.
+
+
 ### Task 3: Regression with a dummy variable 
-Estimate a bivariate regression model of the form: $\hat{Deportations}=\beta_0 + \beta_1*Party~of~President$ and report the results from the regression model by summarizing the regression object.  Based on the *table* of results, what would be the predicted number of deportations for Republicans and for Democrats.  What does $\beta_0$ and $\beta_1$ tell us? Based on the model, is there evidence to reject the null hypothsis that $\overline{D}_{Dem}=\overline{D}_{Rep}$?  This task is worth 100 points. Before doing this, you should read "The US Deportation System: History, Impacts, and New Empirical Research" by Caitlin Patler and Bradford Jones.   
+Estimate a bivariate regression model of the form: $\hat{Deportations}=\beta_0 + \beta_1*Party~of~President$ and report the results from the regression model by summarizing the regression object.  Based on the *table* of results, what would be the predicted number of deportations for Republicans and for Democrats.  What does $\beta_0$ and $\beta_1$ tell us? Based on the model, is there evidence to reject the null hypothesis that $\overline{D}_{Dem}=\overline{D}_{Rep}$?  This task is worth 100 points. Before doing this, you should read "The US Deportation System: History, Impacts, and New Empirical Research" by Caitlin Patler and Bradford Jones.   
 
 ```{r echo=TRUE}
 #Insert code to do this task in this chunk 
@@ -120,6 +123,8 @@ summary(regParty)
 ```
 
 ### Task 3 answer goes here
+
+To get the predicted number of deportations under Republicans, we would calculate $\beta_0+(\beta_1 \cdot 0)$ which is simply $\beta_0=94,800$ for this data. This is because Republicans are the reference category, so our we can approximate 94,808 deportations under a Republican president. We do the same thing for Democrats, but multiply $\beta_1$ by 1 instead of 0. This gives us $\beta_0+(\beta_1 \cdot 1)=125,843$, meaning that the estimated number of deportations under a Democratic president would be 125,843. In this data $\beta_0$ tells us the predicted average deportations under a Republican President. $\beta_0$ on the other hand, represents the estimated average difference in the number of deportations when there is a Democratic president compared to a Republican one. However, we cannot reject the null hypothesis as the p-value we get is above 0.05, meaning that the data is not statistically significant. The lack of statistical significance in the data aligns with the views expressed in **The US Deportation System: History, Impacts, and New Empirical Research**. Some of the factors that could have caused the fluctuations seen in the data include the number of deportations that "accelerated during the first and second Barack Obama Administrations" (Patler & Jones, 2025, p. 8), along with the development of the framework known as "crimmigration" which saw "the merging of some of the most punitive aspects of US criminal and immigration laws."(Patler & Jones, 2025, page 8). This, along with several other factors, would cause great fluctuations in the data collected. Therefore, a bivariate model looking only at the president's party is too simple to capture the complex set of legislation that actually drove these deportations.
 
 
 ### Task 4: Plot regression object
@@ -140,6 +145,8 @@ plot_model(regParty, type = "pred", terms = c("presidentParty"), ci.lvl = 0.95,
 ```
 
 ### Task 4 answer goes here
+
+The plot is most consistent with the null hypothesis, which states that there is no statistically significant difference in the average number of deportations between Democratic and Republican presidencies. This is because of the error bars on the plot, which substantially overlap. These confidence intervals represent the 95% confidence intervals for the predicted average number of deportations. Therefore, the plot suggests that the difference in number of deportations that we see in the data is not statistically significant, and we fail to reject the null hypothesis. We can connect this back to our previous observations, seeing as different enforcement mechanisms and policies were established and expanded upon across different presidencies. This would lead to the great variance and fluctuation seen in the data, aligning with the article's broader argument that the "crimmigration" system has a powerful institutional momentum whose its trajectory is shaped by a wide array of factors.
 
 
 ### Task 5: Regression by decade
@@ -196,7 +203,7 @@ summary(reg1)
 
 plot_model(reg1, type = "pred", terms = c("pre_post96"), ci.lvl = 0.95, 
            title = "\nUse of deportations before and after 1996\n", 
-           axis.title = c("Period", "Number of deportations"), color = "black")+
+           axis.title = c("Period", "Number of deportations"), color = "darkgrey")+
             geom_line()+ 
             theme_bw()
 
