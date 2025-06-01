@@ -146,14 +146,14 @@ plot_model(regParty, type = "pred", terms = c("presidentParty"), ci.lvl = 0.95,
 
 ### Task 4 answer goes here
 
-The plot is most consistent with the null hypothesis, which states that there is no statistically significant difference in the average number of deportations between Democratic and Republican presidencies. This is because of the error bars on the plot, which substantially overlap. These confidence intervals represent the 95% confidence intervals for the predicted average number of deportations. Therefore, the plot suggests that the difference in number of deportations that we see in the data is not statistically significant, and we fail to reject the null hypothesis. We can connect this back to our previous observations, seeing as different enforcement mechanisms and policies were established and expanded upon across different presidencies. This would lead to the great variance and fluctuation seen in the data, aligning with the article's broader argument that the "crimmigration" system has a powerful institutional momentum whose its trajectory is shaped by a wide array of factors.
+The plot is most consistent with the null hypothesis, which states that there is no statistically significant difference in the average number of deportations between Democratic and Republican presidencies. This is because of the error bars on the plot, which substantially overlap. These confidence intervals represent the 95% confidence intervals for the predicted average number of deportations. Therefore, the plot suggests that the difference in number of deportations that we see in the data is not statistically significant, and we fail to reject the null hypothesis. We can connect this back to our previous observations, seeing as different enforcement mechanisms and policies were established and expanded upon across different presidencies. This would lead to the great variance and fluctuation seen in the data, aligning with the article's broader argument that the 'crimmigration' system has a powerful institutional momentum whose trajectory is shaped by a wide array of factors.
 
 
 ### Task 5: Regression by decade
 
 In the Patler and Jones article I asked you to read, they point out that several policies were enacted that made deportations easier to carry out.  Among one of the most important policy was the Illegal Immigration Reform and Immigrant Responsibility Act, 1996.  One prediction might be that after changes in the 1990 (like the IIRIA), we should observe and increase in deportations starting in the 1990s.  To assess this claim, do the following: 
 
-Create a well-labled factor-level variable denoting each decade starting with the 1950s (1951-1960) going up to the 2010s (2011-2020) and then estimate a regression model treating the dependent variable (i.e the number of deportations) as a function of the decade-factor level variable. Following this plot the regression model using $\textrm{plot_model}.  Provide a thorough interpretation of the regression model with a focus on the claims made in the paragraph above.  Are the results consistent with the basic claim made? This task is worth 100 points. 
+Create a well-labeled factor-level variable denoting each decade starting with the 1950s (1951-1960) going up to the 2010s (2011-2020) and then estimate a regression model treating the dependent variable (i.e the number of deportations) as a function of the decade-factor level variable. Following this plot the regression model using $\textrm{plot_model}.  Provide a thorough interpretation of the regression model with a focus on the claims made in the paragraph above.  Are the results consistent with the basic claim made? This task is worth 100 points. 
 
 
 ```{r echo=TRUE}
@@ -170,14 +170,16 @@ regDecades <- lm(Deportations~ period, data = remove.1)
 summary(regDecades)
 
 plot_model(regDecades, type = "pred", terms = c("period"), ci.lvl = 0.95,
-           title = "\nDeportations under Democratic and Republican presidents\n", 
-           axis.title = c("Party", "Number of removals"), 
-           colors = c("black"))+
+           title = "\nNumber of Deportations Per Decade\n(Significant increase after 1990's)", 
+           axis.title = c("Decade", "Number of removals"), 
+           colors = c("darkgrey"))+
              geom_line()+
              theme_bw()
 ```
 
 ### Task 5 answer goes here
+
+Based on our regression model, we can conclude that there is are statistically significant findings demonstrating a strong predictive capability. We can see that the number of removals before in the decades before 1990 are not statistically distinguishable, with substantially overlapping error bars. A statistically significant increase in deportations did occur in the 1991-2000 decade, with non overlapping confidence intervals indicating that this change was not simply due to chance. There was an estimated average increase of almost 80,000 deportations. This strongly supports the hypothesis that major policy changes in the 1990s, notably the 1996 IIRIRA, led to this observable rise. We see an even greater increase in the following decade (2001-2010), with an average increase of around 262,000 from baseline. The following decade continues this trend with an average increase of around 335,000 from baseline. Since all of these decades after 1990 show a statistically significant increase, we can conclude that the data does in fact corroborate the Patler and Jones (2025) article, detailing the IIRIRA's pivotal role in expanding the U.S. "crimmigration" system. We can also see the great increase in the 2000's and 2010's due to post 9/11 legislation and great increase in removals during Obama's terms. 
 
 
 ### Task 6: Pre-post 1996
@@ -202,11 +204,19 @@ reg1 <- lm(Deportations~pre_post96, data = remove.1)
 summary(reg1)
 
 plot_model(reg1, type = "pred", terms = c("pre_post96"), ci.lvl = 0.95, 
-           title = "\nUse of deportations before and after 1996\n", 
-           axis.title = c("Period", "Number of deportations"), color = "darkgrey")+
+           title = "\nUse of deportations before and after 1996, 1948-2022\n", 
+           axis.title = c("Years Before and After 1996", "Number of deportations"), color = "darkgrey")+
             geom_line()+ 
             theme_bw()
 
 ```
 
 ### Task 6 answer goes here
+
+The regression model, treating deportations as a function of a dummy variable distinguishing the period before 1996 from 1996 and all the years after, was estimated to test the null hypothesis ($\beta_1$=0) of no change in average deportations. The model's output shows that average deportations were approximately 20,835 (the intercept, $\beta_0$) in the years before 1996. For the period from 1996 onward, deportations increased by an estimated average of 245,700 per year (the coefficient $\beta_1$ for the pre_post96 variable), resulting in a much higher predicted average of approximately 266,535 deportations. This signifies a massive surge in average removals. This substantial increase is highly statistically significant, with the coefficient for the post-1996 period ($\beta_1$) having an extremely small p-value (less than 0.0001), leading to a decisive rejection of the null hypothesis. Furthermore, this simple pre/post-1996 distinction proves to be a very powerful predictor, explaining approximately 77.2% of the variation in deportation numbers (as indicated by the Multiple R-squared of 0.7717). This finding powerfully corroborates the Patler and Jones (2025) article, which highlights the enactment of the Illegal Immigration Reform and Immigrant Responsibility Act (IIRIRA) in 1996 as a pivotal turning point that fundamentally changed and escalated the U.S. deportation system.
+
+
+### Works cited
+Patler, Caitlin, and Bradford S. Jones. "The US Deportation System: History, Impacts, and New Empirical Research: Introduction."
+
+
