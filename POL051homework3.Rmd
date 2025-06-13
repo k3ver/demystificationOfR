@@ -1,0 +1,154 @@
+---
+title: "Project 3: The criminality narrative"
+author: "Kevin Angeles Marquez"
+date: "June 2, 2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+
+
+
+options(scipen = 999)  # turns off scientific notations like 1e+40
+
+rm(list=ls(all=TRUE))
+
+library(tidyverse)
+library(sjPlot)
+library(plotly)
+
+#Below, this is a working directory for my computer.
+#Change the contents within the parentheses to correspond
+#to YOUR COMPUTER!!!!  Remember: you need the quotes ("....")
+
+#setwd("/Users/bradfordjones/Dropbox/POL 51 Revamped/POL 51 Spring 2024/Slidesets")
+
+#setwd("~/Dropbox/R Sandbox/Teaching Materials/Slidesets25")
+setwd("~/schoolWork/2025springQuarter/POL051/homework")
+```
+
+## Overview
+
+A common trope in the immigration debate is that undocumented immigrants commit, at high rates, violent crimes. Therefore, the supposition is that migrants who are deported are migrants who have committed serious criminal infractions.  This idea is prevalent in political rhetoric surrounding the issue of deportation.  But is the claim consistent with the actual data?  This is the basis of this *short* Project 3.  This assignment is asking you to analyze real-world data on deportations in the United States between the years 2003 and 2024.  The data you access records annual ICE removals (deportations) based on what ICE records as the "Most Serious Criminal Conviction" for someone who is deported.  The following information is from TRAC (Transactional Records Access Clearinghouse)  and describes what the classification levels mean: 
+
+"Seriousness Level of MSCC Conviction. ICE classifies National Crime Information Center (NCIC) offense codes into three seriousness levels. The most serious (Level 1) covers what ICE considers to be "aggravated felonies." Level 2 offenses cover other felonies, while Level 3 offenses are misdemeanors, including petty and other minor violations of the law. TRAC uses ICE's "business rules" to group recorded NCIC offense codes into these three seriousness levels." 
+
+Essentially what this loosely means is that "Level 1" convictions are the most serious and "Level 3" convictions are generally minor legal infractions.  In addition to Levels 1-3, there is a fourth category called "None" denoting that the deportee had no criminal convictions.  Review the Patler and Jones article, especially the section on the criminality narrative.  An HTML file of your results are due  on Canvas by June 12 at 11:59 PM.  *No extensions will be granted and late submissions will not be graded.  Rmd-only submissions will not be graded.* This assignment is worth 300 points.  
+ 
+
+\tiny 
+
+```{r echo=TRUE}
+reasons="https://raw.githubusercontent.com/mightyjoemoon/POL51/main/ICE_reasonforremoval.csv"
+reasons<-read_csv(url(reasons))
+summary(reasons)
+
+```
+## Task 1
+
+The following is a line plot of the four levels of criminality (Levels 1-3 and None). First add proper labels to each axis and give a main title.  Next, provide a thorough interpretation of the plot that is non-mechanical and substantive.  If you were conveying the information from this plot to an audience interested in understanding deportation, what would you say?  This task is worth 100 points. 
+
+\tiny 
+
+```{r echo=TRUE}
+
+ggplot(reasons, aes(x = Year)) +
+  geom_line(aes(y = None, color="None"), size=.6) +
+  geom_line(aes(y = Level1, color="Level 1"), size=.6, linetype=1) +
+  geom_line(aes(y = Level2, color="Level 2"), size=.6, linetype=1) +
+  geom_line(aes(y = Level3, color="Level 3"), size=.6, linetype=1) +
+labs(title="Deportations by Severity of Criminal Record, 2003-2024",
+     y="Number of immigrants deported", x="Year",
+     color="Severity of criminal record") +
+  theme_classic() +
+  theme(#panel.grid.major.y = element_line(colour = "grey", linetype = "dashed"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.text.y = element_text(size=9),
+    axis.text.x = element_text(size=9, angle=45, hjust=1),
+            axis.ticks = element_blank(),
+    plot.caption=element_text(hjust=0, size=10),
+    legend.position=c(.85,.98),
+    legend.justification=c("right", "top"),
+    legend.title = element_text(size = 8), 
+    legend.text = element_text(size = 8),
+    plot.title = element_text(size=12))  
+
+
+```
+
+## Task 1 answer goes here
+Looking at the last two decades, we see that the story of immigration in the US has not been as focused on crime as some would be led to believe. The numbers are overwhelmingly driven by the deportation of individuals with little to no criminal background. The major policy shifts that led to a massive increase in deportations in the late 2000s and the subsequent decline disproportionately affected this group.
+
+
+## Task 2: Regression
+
+For this task you will create three new variables from existing ones in the data set.  **First**, create a new variable called "minor" that sums all deportations associated with no criminal conviction ("None") and Level 3 convictions.  These are the deportations associated with minor or no criminal activity. **Second**, compute the percentage of all deportations that are "minor" deportations (i.e. $100 \times \frac{None + Level~3}{None + Level~1 + Level~2 + Level~3}$).  **Third**, center the variable using 2014 as the basis year (how to do this will be discussed in class). Name this variable "time." **Fourth**, estimate a linear regression model using the variable *minor* as the dependent variable and the variable *time* as the independent variable.  Provide an interpretation of the regression results including presenting the results visually using plot_model.  What do we learn about the criminality narrative based on these results.  This task is worth 100 points.  
+
+
+ 
+
+```{r echo=TRUE}
+#Put R code here 
+
+reasons$minor <- reasons$None + reasons$Level3
+summary(reasons$minor)
+
+reasons$percentMinor <- 100 * (reasons$minor/reasons$All)
+
+reasons$timeCentered <- reasons$Year - reasons$Year[reasons$Year == 2014]
+table(reasons$timeCentered)
+
+regMinor <- lm(percentMinor ~ timeCentered, data = reasons)
+summary(regMinor)
+
+p2 <- plot_model(regMinor, type = "pred", terms = c("timeCentered"), 
+                 ci.lvl = 0.95, show.data = TRUE, title = "Percentage of 
+                 deportations of level 3 or non-criminal convictions", 
+                 axis.title = c("Time from 2014", "Percentage"), 
+                 colors = c("darkgrey"))+
+  geom_line()+
+  theme_bw()
+
+p2
+
+```
+
+## Task 2 answer goes here
+
+Based on our analysis, there is no statistical evidence to support the claim that the proportion of deportations for minor or non-criminal offenses has been increasing or decreasing over the years in your dataset. The percentage of deportations for minor offenses has remained statistically stable. In any given year, the data points fluctuate, but there is no significant underlying trend. The vast majority of deportations in any given year in this dataset (around 74%) are for individuals with minor or no criminal convictions, and this has not changed in a statistically meaningful way over time.
+
+
+## Task 3: Presidential differences 
+
+Are there differences in criminality levels of deportees by President?  This is the question you will answer here.  To do this, create a factor-level variable denoting each President.  In the data set, there is a variable called "President" and records each president as: "Bush1", "Bush2", "Obama1", "Obama2", "Trump", "Biden."  Estimate a regression model treating this factor-level variable as the indpendent variable and "minor" as the dependent variable.  What do the results show?  Provide an interpretation of the regression results, including a plot of the regression model.  This task is worth 100 points. 
+
+
+```{r echo=TRUE}
+#Put R code here
+
+reasons$presFactor <- factor(reasons$President, levels = c("Bush1", "Bush2", 
+                                                           "Obama1", "Obama2", 
+                                                           "Trump", "Biden"), 
+                             labels = c("Bush1", "Bush2", "Obama1", "Obama2", 
+                                        "Trump", "Biden"))
+
+reg2 <- lm(percentMinor ~ presFactor, data = reasons)
+summary(reg2)
+
+plot_model(reg2, type = "pred", terms = c("presFactor"), 
+           ci.lvl = 0.95, show.data = TRUE, title = "Number of deportations
+           through presidential terms", 
+           axis.title = c("Time from 2014", "Percentage"), 
+           colors = c("darkgrey"))+
+  geom_line()+
+  theme_bw()
+
+```
+
+## Task 3 answer goes here
+
+While there are some fluctuations in the average percentage of deportations for minor offenses from one presidential administration to another, there are no statistically significant differences between them. The high p-values for each coefficient and for the overall F-test show that we cannot confidently claim that any single president's policies led to a meaningfully different proportion of deportations for minor offenses compared to another's. The visual overlap of the error bars in the plot reinforces this conclusion. Essentially, the variations seen in the plot are likely due to random chance and normal year-to-year fluctuations rather than a systematic policy shift tied to a specific president.
